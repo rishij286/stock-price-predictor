@@ -6,7 +6,7 @@ The stock price predictor is a personal project aimed at applying data science a
 While this project is still a work in progress, it has already been a major learning opportunity, combining curiosity, self-learning, and experimentation.  
 
 ## Why This Project?
-I wanted to bridge the gap between abstract machine learning concepts and real-world application. Financial markets offered a fascinating, data-rich problem space to explore. The stock market also provided a personal motivation: I’ve always wondered if you could use code to find patterns or signals in the chaos of market data.  
+I wanted to bridge the gap between abstract machine learning concepts and real-world application. Financial markets offered a fascinating, data-rich problem space to explore. The stock market also provided a personal motivation: I’ve always wondered if you could use code to find patterns or signals in the chaos of market data, even if it's not 100% accurate.  
 
 ## How to Run
 Coming soon – will include setup instructions once the first working version is ready.
@@ -32,9 +32,11 @@ Coming soon – will include setup instructions once the first working version i
 - Visualize trends with **matplotlib**  
 - Build and test regression models (**ongoing**)  
 - Explore feature engineering, technical indicators (moving averages, RSI)  
-- Evaluate model performance with RMSE and other metrics  
-- 🔜 Research and implement **LSTM-based models** for sequence prediction  
-- 🔜 Build a lightweight dashboard/UI (future goal)  
+- Evaluate model performance with RMSE and other metrics
+
+Future goals:
+- Research and implement **LSTM-based models** for sequence prediction  
+- Build a lightweight dashboard/UI (future goal)  
 
 ## Reflections & Takeaways
 This project has taught me that building something from scratch isn’t about getting everything right the first time. It’s about persistence, experimentation, and learning from each failure.  
