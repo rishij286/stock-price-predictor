@@ -1,55 +1,70 @@
-# Stock Price Predictor (WIP)
+# Stock Price Predictor
 
 ## Project Overview
-The stock price predictor is a personal project aimed at applying data science and machine learning concepts to forecast stock trends. The goal is to build a Python-based tool that takes real-time historical data, processes it, and generates predictive insights.  
-
-While this project is still a work in progress, it has already been a major learning opportunity, combining curiosity, self-learning, and experimentation.  
+This project explores whether simple machine learning signals can predict short-term stock price direction, and whether those predictions translate into a profitable trading strategy. The goal was to build something end-to-end: download historical stock data, engineer features, train a model, evaluate it, and then see how it performs as an actual trading strategy instead of just a prediction task.
 
 ## Why This Project?
-I wanted to bridge the gap between abstract machine learning concepts and real-world application. Financial markets offered a fascinating, data-rich problem space to explore. The stock market also provided a personal motivation: I’ve always wondered if you could use code to find patterns or signals in the chaos of market data, even if it's not 100% accurate.  
+I wanted to take machine learning concepts out of the classroom and actually apply them to a real problem. Financial markets felt like the perfect place to explore because they are noisy, unpredictable, and full of data.
 
-## How to Run
-Coming soon – will include setup instructions once the first working version is ready.
+I have always wondered whether code could help uncover patterns or signals in market data, even if they are small or imperfect. This project became a way to test that curiosity while learning through building.
+
+## How It Works (Pipeline)
+Right now the project follows this workflow:
+
+1. Fetch historical NVDA stock data using `yfinance`
+2. Engineer features:
+   - daily returns  
+   - 50-day and 200-day moving averages  
+   - distance from price to each moving average  
+3. Create a target label:
+   - `1` if the next day closing price is higher  
+   - `0` otherwise  
+4. Train a logistic regression classifier  
+5. Evaluate performance using:
+   - accuracy  
+   - ROC-AUC  
+   - confusion matrix  
+   - classification report  
+6. Turn predictions into a trading strategy:
+   - go long when the model predicts up  
+   - stay in cash otherwise  
+7. Backtest the strategy and compare it to buy-and-hold
 
 ## Tools and Libraries
-- **Python**
-- **yfinance** – fetch stock market data  
-- **pandas & numpy** – data cleaning and manipulation  
-- **matplotlib** – visualizations and trend exploration  
-- **scikit-learn** – basic ML models (e.g., linear regression)  
-- *Future scope:* PyTorch or TensorFlow for LSTM-based deep learning models  
+- Python  
+- yfinance for fetching stock market data  
+- pandas and numpy for data processing  
+- matplotlib for data visualization  
+- scikit-learn for the machine learning model (logistic regression)
+
+## Results So Far
+The model currently performs close to random when predicting single-day price direction. The ROC-AUC score is around 0.5, and the strategy underperforms buy-and-hold over the same period.
+
+This was actually a useful result. It showed me how noisy daily price movements are, and how hard it is to model direction on such a short time scale.
 
 ## Learning Goals
-- Gain hands-on experience with data preprocessing and handling real-time data  
-- Build and evaluate predictive models  
-- Improve debugging and code structuring practices  
-- Explore advanced ML models (like LSTMs)  
-- Potentially build a UI/dashboard for interactivity  
+- Work with real market data instead of toy datasets  
+- Practice feature engineering and model evaluation  
+- Learn how to structure and clean Python projects better  
+- Understand the difference between prediction accuracy and real strategy performance  
+- Develop an intuition for why many strategies fail in practice  
 
-## Project Timeline & Milestones
-- Setup and fetch stock data with **yfinance**  
-- Clean and preprocess data with **pandas/numpy**  
-- Visualize trends with **matplotlib**  
-- Build and test regression model
-- Explore feature engineering, technical indicators (moving averages, RSI)  
-- Evaluate model performance with RMSE and other metrics
+## Reflections and Takeaways
+This project reminded me that building something from scratch is not about getting everything right the first time. It is about persistence, trial and error, and learning from mistakes along the way.
 
-Future goals:
-- Research and implement **LSTM-based models** for sequence prediction  
-- Build a lightweight dashboard/UI
+More specifically, I started by trying to predict whether a stock like NVDA would go up or down the next day. Through working on this, I learned a key lesson: daily price direction is extremely hard to predict.
 
-## Reflections & Takeaways
-This project has taught me that building something from scratch isn’t about getting everything right the first time. It’s about persistence, experimentation, and learning from each failure.  
+The model’s predictions were basically no better than chance.
 
-I’ve learned how to troubleshoot, read documentation more effectively, and push through when things break. While it’s not polished yet, it represents my growth as a builder and my curiosity as a developer.  
+This helped me understand why real trading research usually focuses on:
+- longer time horizons  
+- richer and alternative features beyond simple price data  
+- risk-adjusted performance instead of raw accuracy  
 
-Speaking on the project more specifically, I started out with trying to predict if a stock (such as NVDA) would go up or down today. Through trying to do this in the prokect, I took away a key lesson: **Daily price direction is very hard to predict.**
+Now that I know this, my next step is to experiment with a weekly prediction horizon and see whether the signal becomes stronger when the time frame is less noisy.
 
-My model was predicting at random.
-
-This showed me why hedge funds focus on:
-- longer horizons
-- richer / alternative features beyond simple price signals
-- risk-adjusted strategies instead of raw accuracy
-
-Now knowing this, I'll pivot to weekly targets instead of daily, and see if the signal improves.
+## Next Steps
+- Try predicting weekly instead of daily movement  
+- Add more features such as volatility and rolling returns  
+- Compare logistic regression to other models  
+- Improve the backtest to make it more realistic  
