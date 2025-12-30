@@ -30,15 +30,26 @@ Coming soon – will include setup instructions once the first working version i
 - Setup and fetch stock data with **yfinance**  
 - Clean and preprocess data with **pandas/numpy**  
 - Visualize trends with **matplotlib**  
-- Build and test regression models (**ongoing**)  
+- Build and test regression model
 - Explore feature engineering, technical indicators (moving averages, RSI)  
 - Evaluate model performance with RMSE and other metrics
 
 Future goals:
 - Research and implement **LSTM-based models** for sequence prediction  
-- Build a lightweight dashboard/UI (future goal)  
+- Build a lightweight dashboard/UI
 
 ## Reflections & Takeaways
 This project has taught me that building something from scratch isn’t about getting everything right the first time. It’s about persistence, experimentation, and learning from each failure.  
 
 I’ve learned how to troubleshoot, read documentation more effectively, and push through when things break. While it’s not polished yet, it represents my growth as a builder and my curiosity as a developer.  
+
+Speaking on the project more specifically, I started out with trying to predict if a stock (such as NVDA) would go up or down today. Through trying to do this in the prokect, I took away a key lesson: **Daily price direction is very hard to predict.**
+
+My model was predicting at random.
+
+This showed me why hedge funds focus on:
+- longer horizons
+- richer / alternative features beyond simple price signals
+- risk-adjusted strategies instead of raw accuracy
+
+Now knowing this, I'll pivot to weekly targets instead of daily, and see if the signal improves.
