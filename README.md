@@ -31,16 +31,12 @@ Right now the project follows this workflow:
 7. Backtest the strategy and compare it to buy-and-hold
 
 ## Tools and Libraries
-- Python  
-- yfinance for fetching stock market data  
-- pandas and numpy for data processing  
-- matplotlib for data visualization  
-- scikit-learn for the machine learning model (logistic regression)
-
-## Results So Far
-The model currently performs close to random when predicting single-day price direction. The ROC-AUC score is around 0.5, and the strategy underperforms buy-and-hold over the same period.
-
-This was actually a useful result. It showed me how noisy daily price movements are, and how hard it is to model direction on such a short time scale.
+- **Python**
+- **yfinance** – fetch stock market data  
+- **pandas & numpy** – data cleaning and manipulation  
+- **matplotlib** – visualizations and trend exploration  
+- **scikit-learn** – basic ML models (e.g., linear regression)  
+- *Future scope:* PyTorch or TensorFlow for LSTM-based deep learning models  
 
 ## Learning Goals
 - Work with real market data instead of toy datasets  
@@ -68,3 +64,10 @@ Now that I know this, my next step is to experiment with a weekly prediction hor
 - Add more features such as volatility and rolling returns  
 - Compare logistic regression to other models  
 - Improve the backtest to make it more realistic  
+
+## Cloud Extension (AWS)
+
+This project includes a cloud-based extension:
+- Input data stored in Amazon S3
+- Preprocessing executed on an EC2 free-tier instance
+- Outputs uploaded back to S3
