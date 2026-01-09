@@ -26,8 +26,44 @@ pd.set_option('display.max_columns', 20)
 
 # download stock data function, return cleaned dataframe
 def load_data(ticker: str = "NVDA", period: str = "5y") -> pd.DataFrame:
-    df = yf.download([ticker], period=period)
+    # Try yfinance first
+    df = yf.download([ticker], period=period, progress=False)
 
+    # If yfinance fails/empty, fall back to local CSV
+    if df is None or df.empty:
+        stock_csv = f"{ticker}_data.csv"
+        print(f"yfinance download failed/empty. Falling back to {stock_csv}")
+
+        df = pd.read_csv(stock_csv)
+
+        # Handle your "Price/Close/High/Low/Open/Volume" CSV format
+        if "Price" in df.columns and "Date" not in df.columns:
+            df = df.rename(columns={"Price": "Date"})
+        if "Close" in df.columns and "Close_NVDA" not in df.columns:
+            df = df.rename(columns={"Close": "Close_NVDA"})
+
+        # Parse Date
+        if "Date" in df.columns:
+            df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+            df = df.dropna(subset=["Date"]).reset_index(drop=True)
+        else:
+            raise KeyError(f"No Date column found in {stock_csv}. Columns: {df.columns.tolist()}")
+
+        # Make Close numeric
+        df["Close_NVDA"] = (
+            df["Close_NVDA"].astype(str)
+            .str.replace(",", "", regex=False)
+            .str.replace("$", "", regex=False)
+        )
+        df["Close_NVDA"] = pd.to_numeric(df["Close_NVDA"], errors="coerce")
+        df = df.dropna(subset=["Close_NVDA"]).reset_index(drop=True)
+
+        # Add Year/Month
+        df["Year"] = df["Date"].dt.year
+        df["Month"] = df["Date"].dt.month
+        return df
+
+    # Save downloaded data
     stock_csv = f"{ticker}_data.csv"
     df.to_csv(stock_csv)
     print(f"Saved downloaded data to {stock_csv}")
@@ -41,6 +77,11 @@ def load_data(ticker: str = "NVDA", period: str = "5y") -> pd.DataFrame:
     df = df.rename(columns={close_col: "Close_NVDA"})
 
     df = df.reset_index()
+
+    # ensure Date is datetime
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    df = df.dropna(subset=["Date"]).reset_index(drop=True)
+
     df["Year"] = df["Date"].dt.year
     df["Month"] = df["Date"].dt.month
 
