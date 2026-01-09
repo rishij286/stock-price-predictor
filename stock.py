@@ -1,3 +1,8 @@
+import matplotlib
+matplotlib.use("Agg") # Use a non-interactive backend for matplotlib
+
+import os # ensure output directory exists
+
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -23,9 +28,17 @@ pd.set_option('display.max_columns', 20)
 def load_data(ticker: str = "NVDA", period: str = "5y") -> pd.DataFrame:
     df = yf.download([ticker], period=period)
 
+    stock_csv = f"{ticker}_data.csv"
+    df.to_csv(stock_csv)
+    print(f"Saved downloaded data to {stock_csv}")
+
     # flatten MultiIndex columns if needed
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = [col[0] if col[1] == '' else f"{col[0]}_{col[1]}" for col in df.columns]
+
+    # ensure close is named correctly
+    close_col = "Close_NVDA" if "Close_NVDA" in df.columns else "Close"
+    df = df.rename(columns={close_col: "Close_NVDA"})
 
     df = df.reset_index()
     df["Year"] = df["Date"].dt.year
@@ -80,21 +93,25 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna().reset_index(drop=True)
     return df
 
+# plot 50 and 200 day moving averages along with their difference percentage
+def plot_moving_averages(df: pd.DataFrame, outpath="outputs/moving_averages.png") -> None:
+    fig, axs = plt.subplots(2, figsize=(10, 6))
+    fig.suptitle("Price & Moving Avg VS Difference in MAs")
 
-
-def plot_moving_averages(df: pd.DataFrame) -> None:
-    fig, axs = plt.subplots(2)
-    fig.suptitle('Price & Moving Avg VS Difference in MAs')
-    axs[0].plot(df['Date'], df['Close_NVDA'])
-    axs[0].plot(df['Date'], df['MA_50'])
-    axs[0].plot(df['Date'], df['MA_200'])
+    axs[0].plot(df["Date"], df["Close_NVDA"])
+    axs[0].plot(df["Date"], df["MA_50"])
+    axs[0].plot(df["Date"], df["MA_200"])
     axs[0].legend(["Close", "MA_50", "MA_200"])
     axs[0].set_ylabel("Price ($)")
 
-    axs[1].plot(df['Date'], df['MA_Diff_Pct'])
+    axs[1].plot(df["Date"], df["MA_Diff_Pct"])
     axs[1].set_ylabel("MA Diff %")
-    axs[1].axhline(0, color="black", linestyle='--')
-    plt.show()
+    axs[1].axhline(0, color="black", linestyle="--")
+
+    fig.tight_layout()
+    fig.savefig(outpath)
+    plt.close(fig)
+    print(f"Saved {outpath}")
 
 
 
@@ -154,9 +171,13 @@ def evaluate_model(model, X_test, y_test, y_pred, df: pd.DataFrame):
     #tpr = true positive rate
     #fpr = false positive rate
     fpr, tpr, _ = roc_curve(y_test, y_proba)
+    plt.figure()
     plt.plot(fpr, tpr)
-    plt.title('ROC Curve')
-    plt.show()
+    plt.title("ROC Curve")
+    plt.tight_layout()
+    plt.savefig("outputs/roc_curve.png") # save ROC curve plot
+    plt.close()
+    print("Saved outputs/roc_curve.png")
 
     #Classification report for more detailed metrics
     print("\nClassification Report:\n", classification_report(y_test, y_pred))
@@ -218,10 +239,22 @@ def backtest_daily_strategy(df: pd.DataFrame, y_pred, train_len: int):
     plt.ylabel("Equity (starting at 1.0)")
     plt.legend()
     plt.tight_layout()
-    plt.show()
+
+    # save the equity curve plot
+    plt.savefig("outputs/equity_curve.png")
+    plt.close()
+    print("Saved outputs/equity_curve.png")
+
+# save processed data to CSV
+def save_data(df: pd.DataFrame, filename: str = "outputs/processed_data.csv") -> None:
+    df.to_csv(filename, index=False)
+    print(f"Saved {filename}")
 
 
 def main():
+    # ensure output directory exists
+    os.makedirs("outputs", exist_ok=True)
+
     # load and preprocess data
     df = load_data()
     df = add_features(df)
@@ -237,6 +270,7 @@ def main():
     # evaluate model performance using various metrics
     evaluate_model(model, X_test, y_test, y_pred, df)
     backtest_daily_strategy(df, y_pred, len(X_train))
+    save_data(df)
 
 
 if __name__ == "__main__":
